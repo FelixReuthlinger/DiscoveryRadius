@@ -1,8 +1,8 @@
 {
-  "name": "mod name",
+  "name": "DiscoveryRadius",
   "version_number": "1.0.0",
-  "website_url": "replace with link to your mod on github or to your discord",
-  "description": "Your mod description goes here.",
+  "website_url": "https://github.com/FelixReuthlinger/DiscoveryRadius",
+  "description": "Dynamic discovery radius depending on environmental conditions.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2105"
   ]

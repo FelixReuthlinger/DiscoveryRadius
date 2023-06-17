@@ -116,10 +116,8 @@
         <Content Include="CHANGELOG.md" />
         <Content Include="ILRepack.targets" />
         <Content Include="README.md" />
-        <Content Include="ThunderStorePackage\config\replace-or-remove.txt" />
         <Content Include="ThunderStorePackage\icon.png" />
         <Content Include="ThunderStorePackage\manifest.json" />
-        <Content Include="ThunderStorePackage\plugins\replace-or-remove.txt" />
     </ItemGroup>
     <ItemGroup>
       <None Include="App.config" />
@@ -130,8 +128,10 @@
         <Error Text="DLL not found in target directory." Condition="!Exists('$(TargetDir)$(AssemblyName).dll')" />
         <Error Text="DLL not found in target directory." Condition="!Exists('$(TargetDir)$(AssemblyName).pdb')" />
         <MakeDir Directories="$(BepInExPath)\plugins\$(AssemblyName)" Condition="!Exists('$(BepInExPath)\plugins\$(AssemblyName)')" />
+        <Exec Command="$(ProjectDir)libraries\debug\pdb2mdb.exe $(TargetDir)$(AssemblyName).dll" />
         <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll" DestinationFolder="$(BepInExPath)\plugins\$(AssemblyName)" OverwriteReadOnlyFiles="true" />
         <Copy SourceFiles="$(TargetDir)$(AssemblyName).pdb" DestinationFolder="$(BepInExPath)\plugins\$(AssemblyName)" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll.mdb" DestinationFolder="$(BepInExPath)\plugins\$(AssemblyName)" OverwriteReadOnlyFiles="true" />
     </Target>
     <Target Name="MakeThunderStorePackage" AfterTargets="CopyOutputDLL" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <Error Text="README.md not found in project root directory." Condition="!Exists('$(ProjectDir)\README.md')" />

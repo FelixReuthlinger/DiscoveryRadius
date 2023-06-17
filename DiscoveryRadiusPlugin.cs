@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
@@ -37,6 +38,7 @@ public class DiscoveryRadiusPlugin : BaseUnityPlugin
 
     public static ConfigEntry<bool> DisplayCurrentRadiusValue = null!;
     public static ConfigEntry<bool> DisplayVariables = null!;
+    public static ConfigEntry<bool> DisplayDebug = null!;
 
     private void Awake()
     {
@@ -64,7 +66,7 @@ public class DiscoveryRadiusPlugin : BaseUnityPlugin
             "Multiplier to apply to land exploration radius when in a forest (black forest, " +
             "forested parts of meadows and plains). This value is multiplied by the base land exploration " +
             "radius and subtracted from the total. Accepted range 0-1. Set to 0 to disable. Default 0.3.");
-        DaylightRadiusMultiplier = CreateConfig("3 - Exploration Radius Multipliers", "Forest radius multiplier", 0.2f,
+        DaylightRadiusMultiplier = CreateConfig("3 - Exploration Radius Multipliers", "Daylight radius multiplier", 0.2f,
             "Multiplier that influences how much daylight (directional and ambient light) affects " +
             "exploration radius. This value is multiplied by the base land or sea exploration radius and added " +
             "to the total. Accepted range 0-1. Set to 0 to disable. Default 0.2.");
@@ -73,18 +75,18 @@ public class DiscoveryRadiusPlugin : BaseUnityPlugin
             "This value is multiplied by the base land or sea exploration radius and added to the total. " +
             "Accepted range 0-1. Set to 0 to disable. Default 0.3.");
 
-        DisplayCurrentRadiusValue = CreateConfig("4- Miscellaneous", "Display current radius", false,
+        DisplayCurrentRadiusValue = CreateConfig("4 - Miscellaneous", "Display current radius", false,
             "Enabling this will display the currently computed exploration radius in the bottom " +
             "left of the in-game Hud. Useful if you are trying to tweak config values and want to see the result.");
-        DisplayVariables = CreateConfig("4- Miscellaneous", "Display current variables", false,
+        DisplayVariables = CreateConfig("4 - Miscellaneous", "Display current variables", false,
             "Enabling this will display on the Hud the values of various variables that go into " +
             "calculating the exploration radius. Mostly useful for debugging and tweaking the config.");
+        DisplayDebug = CreateConfig("4 - Miscellaneous", "Display debug text", false,
+            "Debugging use only, would not recommend to enable for players.");
 
         AddFixConfigSettings();
         
         Assembly assembly = Assembly.GetExecutingAssembly();
-        _harmony.PatchAll(typeof(HUDPatches));
-        _harmony.PatchAll(typeof(MinimapPatches));
         _harmony.PatchAll(assembly);
     }
 
@@ -98,9 +100,10 @@ public class DiscoveryRadiusPlugin : BaseUnityPlugin
         WeatherRadiusMultiplier.SettingChanged += FixConfigBoundaries;
         DisplayCurrentRadiusValue.SettingChanged += DisplayRadiusValueSettingChanged;
         DisplayVariables.SettingChanged += DisplayVariablesValueSettingChanged;
+        DisplayDebug.SettingChanged += DisplayDebugSettingChanged;
     }
 
-    private void FixConfigBoundaries(object _, System.EventArgs __)
+    private void FixConfigBoundaries(object _, EventArgs __)
     {
         if (LandExploreRadius.Value < 0.0f) LandExploreRadius.Value = 0.0f;
         if (LandExploreRadius.Value > 2000.0f) LandExploreRadius.Value = 2000.0f;
@@ -116,21 +119,39 @@ public class DiscoveryRadiusPlugin : BaseUnityPlugin
         if (WeatherRadiusMultiplier.Value > 1.0f) WeatherRadiusMultiplier.Value = 1.0f;
     }
     
-    private void DisplayRadiusValueSettingChanged(object _, System.EventArgs __)
+    private void DisplayRadiusValueSettingChanged(object _, EventArgs __)
     {
-        HUDPatches.RadiusHudText.gameObject.SetActive(DisplayCurrentRadiusValue.Value);
-        if (!DisplayCurrentRadiusValue.Value)
+        if (HUDPatches.RadiusHudText != null)
         {
-            HUDPatches.RadiusHudText.text = string.Empty;
+            HUDPatches.RadiusHudText.gameObject.SetActive(DisplayCurrentRadiusValue.Value);
+            if (!DisplayCurrentRadiusValue.Value)
+            {
+                HUDPatches.RadiusHudText.text = string.Empty;
+            }
         }
     }
 
-    private void DisplayVariablesValueSettingChanged(object _, System.EventArgs __)
+    private void DisplayVariablesValueSettingChanged(object _, EventArgs __)
     {
-        HUDPatches.VariablesHudText.gameObject.SetActive(DisplayVariables.Value);
-        if (!DisplayVariables.Value)
+        if (HUDPatches.VariablesHudText != null)
         {
-            HUDPatches.VariablesHudText.text = string.Empty;
+            HUDPatches.VariablesHudText.gameObject.SetActive(DisplayVariables.Value);
+            if (!DisplayVariables.Value)
+            {
+                HUDPatches.VariablesHudText.text = string.Empty;
+            }
+        }
+    }
+    
+    private void DisplayDebugSettingChanged(object _, EventArgs __)
+    {
+        if (HUDPatches.DebugText != null)
+        {
+            HUDPatches.DebugText.gameObject.SetActive(DisplayDebug.Value);
+            if (!DisplayDebug.Value)
+            {
+                HUDPatches.DebugText.text = string.Empty;
+            }
         }
     }
 
