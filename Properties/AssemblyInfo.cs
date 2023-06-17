@@ -1,15 +1,15 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
-using ModTemplate;
+using DiscoveryRadius;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle(ModTemplatePlugin.ModName)]
+[assembly: AssemblyTitle(DiscoveryRadiusPlugin.ModName)]
 [assembly: AssemblyDescription("Github Template for a Valheim mod project")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct(ModTemplatePlugin.ModName)]
+[assembly: AssemblyProduct(DiscoveryRadiusPlugin.ModName)]
 [assembly: AssemblyCopyright("Copyright © 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -32,5 +32,5 @@ using ModTemplate;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion(ModTemplatePlugin.ModVersion)]
-[assembly: AssemblyFileVersion(ModTemplatePlugin.ModVersion)]
+[assembly: AssemblyVersion(DiscoveryRadiusPlugin.ModVersion)]
+[assembly: AssemblyFileVersion(DiscoveryRadiusPlugin.ModVersion)]
