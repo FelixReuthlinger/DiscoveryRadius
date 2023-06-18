@@ -1,6 +1,6 @@
 {
   "name": "DiscoveryRadius",
-  "version_number": "1.0.0",
+  "version_number": "1.0.1",
   "website_url": "https://github.com/FelixReuthlinger/DiscoveryRadius",
   "description": "Dynamic discovery radius depending on environmental conditions.",
   "dependencies": [
