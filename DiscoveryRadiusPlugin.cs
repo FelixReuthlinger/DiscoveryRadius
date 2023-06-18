@@ -58,14 +58,11 @@ public class DiscoveryRadiusPlugin : BaseUnityPlugin
             1.5f,
             "Multiplier to apply to land exploration radius based on altitude. " +
             "For every 100 units above sea level (smooth scale), add this value multiplied by " +
-            "LandExploreRadius to the total. For example, with a radius of 200 and a multiplier of " +
-            "0.5, radius is 200 at sea level, 250 at 50 altitude, 300 at 100 altitude, 400 at 200 " +
-            "altitude, etc. For reference, a typical mountain peak is around 170 altitude. " +
-            "Accepted range 0-2. Set to 0 to disable. Default 1.5.");
+            "Land exploration radius to the total. Accepted range 0.0 to 2.0. Set to 0 to disable. Default 1.5.");
         ForestRadiusMultiplier = CreateConfig("3 - Exploration Radius Multipliers", "Forest radius multiplier", 1.0f,
             "Multiplier to apply to land exploration radius when in a forest (black forest, " +
-            "forested parts of meadows and plains). This value is multiplied by the base land exploration " +
-            "radius and subtracted from the total. Accepted range 0-1. Set to 0 to disable. Default 1.0.");
+            "forested parts of meadows or swamp). This value is multiplied by the base land exploration " +
+            "radius and subtracted from the total. Accepted range 0.0 to 1.0. Set to 0 to disable. Default 1.0.");
         DaylightRadiusMultiplier = CreateConfig("3 - Exploration Radius Multipliers", "Daylight radius multiplier", 0.3f,
             "Multiplier that influences how much daylight (directional and ambient light) affects " +
             "exploration radius. This value is multiplied by the base land or sea exploration radius and added " +
