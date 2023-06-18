@@ -93,7 +93,7 @@ namespace DiscoveryRadius.Patches
                     GetEnvironmentalLight() * DiscoveryRadiusPlugin.DaylightRadiusMultiplier.Value;
 
                 // fog and other particles will reduce the sight range
-                var radiusMultiplierSightRange =
+                var radiusMultiplierWeather =
                     -1.0f * Mathf.Clamp(RenderSettings.fogDensity * 10.0f + GetParticlesInEnvironment(), 0.0f, 1.5f) *
                     DiscoveryRadiusPlugin.WeatherRadiusMultiplier.Value;
 
@@ -105,11 +105,11 @@ namespace DiscoveryRadius.Patches
                 var radiusMultiplierBiome = GetLocationModifier(player);
 
                 var radiusTotalMultiplier = radiusMultiplierLighting +
-                                            radiusMultiplierSightRange +
+                                            radiusMultiplierWeather +
                                             radiusMultiplierAltitude +
                                             radiusMultiplierBiome;
 
-                result = Mathf.Clamp(baseRadius * radiusTotalMultiplier, 20.0f, 2000.0f);
+                result = Mathf.Clamp(baseRadius * radiusTotalMultiplier, 35.0f, 1000.0f);
 
                 if (DiscoveryRadiusPlugin.DisplayVariables.Value)
                 {
@@ -120,9 +120,9 @@ namespace DiscoveryRadius.Patches
                             $"\nBase: {baseRadius:0.0}" +
                             $"\nTotal multiplier (sum): {radiusTotalMultiplier:0.00}" +
                             $"\nLighting multiplier: {radiusMultiplierLighting:0.0}" +
-                            $"\nSight range multiplier: {radiusMultiplierSightRange:0.0}" +
+                            $"\nWeather multiplier: {radiusMultiplierWeather:0.0}" +
                             $"\nAltitude multiplier: {radiusMultiplierAltitude:0.0}" +
-                            $"\nBiome multiplier: {radiusMultiplierBiome}";
+                            $"\nBiome multiplier: {radiusMultiplierBiome:0.0}";
                 }
 
                 if (DiscoveryRadiusPlugin.DisplayDebug.Value && HUDPatches.DebugText != null)
@@ -135,7 +135,7 @@ namespace DiscoveryRadius.Patches
                     HUDPatches.DebugText.text = "Discovery radius debug:" +
                                                 $"\ntime={hours:00}:{minutes:00} ({time:0.000})" +
                                                 $"\nplayer on ship={NearPlayerInShip(player)}" +
-                                                $"\naltitude={GetPlayerAltitude(player)}";
+                                                $"\naltitude={GetPlayerAltitude(player):0.0}";
                 }
             }
 
@@ -152,17 +152,17 @@ namespace DiscoveryRadius.Patches
             switch (player.GetCurrentBiome())
             {
                 case Heightmap.Biome.Swamp:
-                    forestPenalty = 0.8f;
+                    forestPenalty = WorldGenerator.InForest(player.transform.position) ? -0.8f: 0.1f;
                     break;
                 case Heightmap.Biome.BlackForest:
-                    forestPenalty = WorldGenerator.InForest(player.transform.position) ? 0.6f : 0.3f;
+                    forestPenalty = WorldGenerator.InForest(player.transform.position) ? -0.6f : 0.2f;
                     break;
                 case Heightmap.Biome.Meadows:
-                    forestPenalty = WorldGenerator.InForest(player.transform.position) ? 0.4f : 0.2f;
+                    forestPenalty = WorldGenerator.InForest(player.transform.position) ? -0.4f : 0.3f;
                     break;
             }
 
-            return -1.0f * forestPenalty * DiscoveryRadiusPlugin.ForestRadiusMultiplier.Value;
+            return forestPenalty * DiscoveryRadiusPlugin.ForestRadiusMultiplier.Value;
         }
 
         /**

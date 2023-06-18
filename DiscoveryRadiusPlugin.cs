@@ -49,10 +49,10 @@ public class DiscoveryRadiusPlugin : BaseUnityPlugin
 
         LandExploreRadius = CreateConfig("2 - Exploration Radius", "Land exploration radius", 150.0f,
             "The radius around the player to uncover while travelling on land near sea level. " +
-            "Higher values may cause performance issues. Max allowed is 2000. Default is 150.");
+            "Higher values may cause performance issues. Max allowed is 1000. Default is 150.");
         SeaExploreRadius = CreateConfig("2 - Exploration Radius", "Sea exploration radius", 200.0f,
             "The radius around the player to uncover while travelling on a boat. " +
-            "Higher values may cause performance issues. Max allowed is 2000. Default is 200.");
+            "Higher values may cause performance issues. Max allowed is 1000. Default is 200.");
 
         AltitudeRadiusMultiplier = CreateConfig("3 - Exploration Radius Multipliers", "Altitude radius multiplier",
             0.5f,
@@ -106,9 +106,9 @@ public class DiscoveryRadiusPlugin : BaseUnityPlugin
     private void FixConfigBoundaries(object _, EventArgs __)
     {
         if (LandExploreRadius.Value < 0.0f) LandExploreRadius.Value = 0.0f;
-        if (LandExploreRadius.Value > 2000.0f) LandExploreRadius.Value = 2000.0f;
+        if (LandExploreRadius.Value > 1000.0f) LandExploreRadius.Value = 1000.0f;
         if (SeaExploreRadius.Value < 0.0f) SeaExploreRadius.Value = 0.0f;
-        if (SeaExploreRadius.Value > 2000.0f) SeaExploreRadius.Value = 2000.0f;
+        if (SeaExploreRadius.Value > 1000.0f) SeaExploreRadius.Value = 1000.0f;
         if (AltitudeRadiusMultiplier.Value < 0.0f) AltitudeRadiusMultiplier.Value = 0.0f;
         if (AltitudeRadiusMultiplier.Value > 2.0f) AltitudeRadiusMultiplier.Value = 2.0f;
         if (ForestRadiusMultiplier.Value < 0.0f) ForestRadiusMultiplier.Value = 0.0f;
