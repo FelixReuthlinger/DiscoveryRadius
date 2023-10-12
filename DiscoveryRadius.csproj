@@ -112,7 +112,6 @@
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>
-        <Content Include=".gitignore" />
         <Content Include="CHANGELOG.md" />
         <Content Include="ILRepack.targets" />
         <Content Include="README.md" />
