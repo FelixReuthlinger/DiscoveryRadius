@@ -18,7 +18,7 @@ namespace DiscoveryRadius.Patches
             Finishing
         }
 
-        [HarmonyPatch("UpdateExplore"), HarmonyTranspiler]
+        [HarmonyPatch(nameof(Minimap.UpdateExplore)), HarmonyTranspiler]
         private static IEnumerable<CodeInstruction?> UpdateExplore_Transpiler(
             IEnumerable<CodeInstruction?> instructions)
         {
