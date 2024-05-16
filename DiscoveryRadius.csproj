@@ -117,7 +117,6 @@
         <Content Include="README.md" />
         <Content Include="ThunderStorePackage\icon.png" />
         <Content Include="ThunderStorePackage\manifest.json" />
-        <Content Include="UpdateManifest.ps1" />
     </ItemGroup>
     <ItemGroup>
       <None Include="App.config" />
@@ -180,11 +179,11 @@
         <RemoveDir Directories="$(ProjectDir)\TempPackage" />
         <Message Text="Created ThunderStore mod zip file '$(HOMEDRIVE)$(HOMEPATH)\Downloads\$(AssemblyName).zip'" />
     </Target>
-    <Import Project="packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets" Condition="Exists('packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets')" />
+    <Import Project="packages\ILRepack.Lib.MSBuild.Task.2.0.32\build\ILRepack.Lib.MSBuild.Task.targets" Condition="Exists('packages\ILRepack.Lib.MSBuild.Task.2.0.32\build\ILRepack.Lib.MSBuild.Task.targets')" />
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>
         <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
       </PropertyGroup>
-      <Error Condition="!Exists('packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ILRepack.Lib.MSBuild.Task.2.0.18.2\build\ILRepack.Lib.MSBuild.Task.targets'))" />
+      <Error Condition="!Exists('packages\ILRepack.Lib.MSBuild.Task.2.0.32\build\ILRepack.Lib.MSBuild.Task.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ILRepack.Lib.MSBuild.Task.2.0.32\build\ILRepack.Lib.MSBuild.Task.targets'))" />
     </Target>
 </Project>
