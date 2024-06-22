@@ -107,7 +107,7 @@ namespace DiscoveryRadius.Patches
                 var radiusTotalMultiplier = radiusMultiplierLighting +
                                             radiusMultiplierWeather +
                                             radiusMultiplierAltitude +
-                                            radiusMultiplierBiome;
+                                            radiusMultiplierBiome + 1.0f;
 
                 result = Mathf.Clamp(baseRadius * radiusTotalMultiplier, 35.0f, 1000.0f);
 
