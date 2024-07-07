@@ -106,6 +106,7 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="DiscoveryLogic.cs" />
         <Compile Include="DiscoveryRadiusPlugin.cs" />
         <Compile Include="Patches\HUDPatches.cs" />
         <Compile Include="Patches\MinimapPatches.cs" />

@@ -7,6 +7,7 @@ using DiscoveryRadius.Patches;
 using HarmonyLib;
 using JetBrains.Annotations;
 using ServerSync;
+using UnityEngine;
 
 namespace DiscoveryRadius;
 
@@ -14,27 +15,54 @@ namespace DiscoveryRadius;
 public class DiscoveryRadiusPlugin : BaseUnityPlugin
 {
     public const string ModName = "DiscoveryRadius";
-    public const string ModVersion = "1.0.5";
+    public const string ModVersion = "1.1.0";
     private const string ModAuthor = "FixItFelix";
     private const string ModGuid = ModAuthor + "." + ModName;
 
     private readonly Harmony _harmony = new(ModGuid);
 
     [UsedImplicitly] public static readonly ManualLogSource ModTemplateLogger =
-        BepInEx.Logging.Logger.CreateLogSource(ModName);
+        BepInEx.Logging.Logger.CreateLogSource(ModGuid);
 
     private static readonly ConfigSync ConfigSync = new(ModGuid)
         { DisplayName = ModName, CurrentVersion = ModVersion };
 
     private static ConfigEntry<bool> _configLocked = null!;
 
+    public static ConfigEntry<float> MinimumRadius = null!;
+    internal static readonly float MinimumRadiusMin = 10.0f;
+    private static readonly float MinimumRadiusMax = 200.0f;
+    private static readonly float MinimumRadiusDefault = 35.0f;
+    public static ConfigEntry<float> MaximumRadius = null!;
+    private static readonly float MaximumRadiusMin = 200.0f;
+    private static readonly float MaximumRadiusMax = 1000.0f;
+    private static readonly float MaximumRadiusDefault = 1000.0f;
     public static ConfigEntry<float> LandExploreRadius = null!;
+    private static readonly float LandExploreRadiusMin = 0.0f;
+    private static readonly float LandExploreRadiusMax = 1000.0f;
+    private static readonly float LandExploreRadiusDefault = 150.0f;
     public static ConfigEntry<float> SeaExploreRadius = null!;
+    private static readonly float SeaExploreRadiusMin = 0.0f;
+    private static readonly float SeaExploreRadiusMax = 1000.0f;
+    private static readonly float SeaExploreRadiusDefault = 200.0f;
+
 
     public static ConfigEntry<float> AltitudeRadiusMultiplier = null!;
+    private static readonly float AltitudeRadiusMultiplierMin = 0.0f;
+    private static readonly float AltitudeRadiusMultiplierMax = 2.0f;
+    private static readonly float AltitudeRadiusMultiplierDefault = 1.5f;
     public static ConfigEntry<float> ForestRadiusMultiplier = null!;
+    private static readonly float ForestRadiusMultiplierMin = 0.0f;
+    private static readonly float ForestRadiusMultiplierMax = 1.0f;
+    private static readonly float ForestRadiusMultiplierDefault = 1.0f;
     public static ConfigEntry<float> DaylightRadiusMultiplier = null!;
+    private static readonly float DaylightRadiusMultiplierMin = 0.0f;
+    private static readonly float DaylightRadiusMultiplierMax = 1.0f;
+    private static readonly float DaylightRadiusMultiplierDefault = 0.3f;
     public static ConfigEntry<float> WeatherRadiusMultiplier = null!;
+    private static readonly float WeatherRadiusMultiplierMin = 0.0f;
+    private static readonly float WeatherRadiusMultiplierMax = 1.0f;
+    private static readonly float WeatherRadiusMultiplierDefault = 0.3f;
 
     public static ConfigEntry<bool> DisplayCurrentRadiusValue = null!;
     public static ConfigEntry<bool> DisplayVariables = null!;
@@ -42,47 +70,71 @@ public class DiscoveryRadiusPlugin : BaseUnityPlugin
 
     private void Awake()
     {
-        _configLocked = CreateConfig("1 - General", "Lock Configuration", true,
+        string generalGroup = "1 - General";
+        _configLocked = CreateConfig(generalGroup, "Lock Configuration", true,
             "If 'true' and playing on a server, config can only be changed on server-side configuration, " +
             "clients cannot override");
         ConfigSync.AddLockingConfigEntry(_configLocked);
 
-        LandExploreRadius = CreateConfig("2 - Exploration Radius", "Land exploration radius", 150.0f,
+        string explorationRadiusGroup = "2 - Exploration Radius";
+        MinimumRadius = CreateConfig(explorationRadiusGroup, "Minimum exploration radius", MinimumRadiusDefault,
+            "The absolute minimum exploration Radius. However you set all the other values, this value will " +
+            "ALWAYS be the minimum radius for exploration. " +
+            $"Accepted range {MinimumRadiusMin} to {MinimumRadiusMax}. Default is {MinimumRadiusDefault}.");
+        MaximumRadius = CreateConfig(explorationRadiusGroup, "Maximum exploration radius", MaximumRadiusDefault,
+            "The absolute maximum exploration Radius. However you set all the other values, this value will " +
+            "ALWAYS be the maximum radius for exploration. " +
+            $"Accepted range {MaximumRadiusMin} to {MaximumRadiusMax}. Default is {MaximumRadiusDefault}.");
+        LandExploreRadius = CreateConfig(explorationRadiusGroup, "Land exploration radius", LandExploreRadiusDefault,
             "The radius around the player to uncover while travelling on land near sea level. " +
-            "Higher values may cause performance issues. Max allowed is 1000. Default is 150.");
-        SeaExploreRadius = CreateConfig("2 - Exploration Radius", "Sea exploration radius", 200.0f,
+            "Higher values may cause performance issues. " +
+            $"Accepted range {LandExploreRadiusMin} to {LandExploreRadiusMax}. Default is {LandExploreRadiusDefault}.");
+        SeaExploreRadius = CreateConfig(explorationRadiusGroup, "Sea exploration radius", SeaExploreRadiusDefault,
             "The radius around the player to uncover while travelling on a boat. " +
-            "Higher values may cause performance issues. Max allowed is 1000. Default is 200.");
+            "Higher values may cause performance issues. " +
+            $"Accepted range {SeaExploreRadiusMin} to {SeaExploreRadiusMax}. Default is {SeaExploreRadiusDefault}.");
 
-        AltitudeRadiusMultiplier = CreateConfig("3 - Exploration Radius Multipliers", "Altitude radius multiplier",
-            1.5f,
-            "Multiplier to apply to land exploration radius based on altitude. " +
+
+        string explorationRadiusMultipliersGroup = "3 - Exploration Radius Multipliers";
+        AltitudeRadiusMultiplier = CreateConfig(explorationRadiusMultipliersGroup, "Altitude radius multiplier",
+            AltitudeRadiusMultiplierDefault,
+            "Multiplier (float) to apply to land exploration radius based on altitude. " +
             "For every 100 units above sea level (smooth scale), add this value multiplied by " +
-            "Land exploration radius to the total. Accepted range 0.0 to 2.0. Set to 0 to disable. Default 1.5.");
-        ForestRadiusMultiplier = CreateConfig("3 - Exploration Radius Multipliers", "Forest radius multiplier", 1.0f,
-            "Multiplier to apply to land exploration radius when in a forest (black forest, " +
+            "Land exploration radius to the total. " +
+            $"Accepted range {AltitudeRadiusMultiplierMin} to {AltitudeRadiusMultiplierMax}. Set to 0 to disable. " +
+            $"Default {AltitudeRadiusMultiplierDefault}.");
+        ForestRadiusMultiplier = CreateConfig(explorationRadiusMultipliersGroup, "Forest radius multiplier",
+            ForestRadiusMultiplierDefault,
+            "Multiplier (float) to apply to land exploration radius when in a forest (black forest, " +
             "forested parts of meadows or swamp). This value is multiplied by the base land exploration " +
-            "radius and subtracted from the total. Accepted range 0.0 to 1.0. Set to 0 to disable. Default 1.0.");
-        DaylightRadiusMultiplier = CreateConfig("3 - Exploration Radius Multipliers", "Daylight radius multiplier", 0.3f,
-            "Multiplier that influences how much daylight (directional and ambient light) affects " +
+            "radius and subtracted from the total. " +
+            $"Accepted range {ForestRadiusMultiplierMin} to {ForestRadiusMultiplierMax}. Set to 0 to disable. " +
+            $"Default {ForestRadiusMultiplierDefault}.");
+        DaylightRadiusMultiplier = CreateConfig(explorationRadiusMultipliersGroup, "Daylight radius multiplier",
+            DaylightRadiusMultiplierDefault,
+            "Multiplier (float) that influences how much daylight (directional and ambient light) affects " +
             "exploration radius. This value is multiplied by the base land or sea exploration radius and added " +
-            "to the total. Accepted range 0-1. Set to 0 to disable. Default 0.3.");
-        WeatherRadiusMultiplier = CreateConfig("3 - Exploration Radius Multipliers", "Weather radius multiplier", 0.3f,
-            "Multiplier that influences how much the current weather affects exploration radius. " +
+            $"to the total. Accepted range {DaylightRadiusMultiplierMin} to {DaylightRadiusMultiplierMax}. " +
+            $"Set to 0 to disable. Default {DaylightRadiusMultiplierDefault}.");
+        WeatherRadiusMultiplier = CreateConfig(explorationRadiusMultipliersGroup, "Weather radius multiplier",
+            WeatherRadiusMultiplierDefault,
+            "Multiplier (float) that influences how much the current weather affects exploration radius. " +
             "This value is multiplied by the base land or sea exploration radius and added to the total. " +
-            "Accepted range 0-1. Set to 0 to disable. Default 0.3.");
+            $"Accepted range {WeatherRadiusMultiplierMin} to {WeatherRadiusMultiplierMax}. Set to 0 to disable. " +
+            $"Default {WeatherRadiusMultiplierDefault}.");
 
-        DisplayCurrentRadiusValue = CreateConfig("4 - Miscellaneous", "Display current radius", false,
+        string miscGroup = "4 - Miscellaneous";
+        DisplayCurrentRadiusValue = CreateConfig(miscGroup, "Display current radius", false,
             "Enabling this will display the currently computed exploration radius in the bottom " +
             "left of the in-game Hud. Useful if you are trying to tweak config values and want to see the result.");
-        DisplayVariables = CreateConfig("4 - Miscellaneous", "Display current variables", false,
+        DisplayVariables = CreateConfig(miscGroup, "Display current variables", false,
             "Enabling this will display on the Hud the values of various variables that go into " +
             "calculating the exploration radius. Mostly useful for debugging and tweaking the config.");
-        DisplayDebug = CreateConfig("4 - Miscellaneous", "Display debug text", false,
+        DisplayDebug = CreateConfig(miscGroup, "Display debug text", false,
             "Debugging use only, would not recommend to enable for players.");
 
         AddFixConfigSettings();
-        
+
         Assembly assembly = Assembly.GetExecutingAssembly();
         _harmony.PatchAll(assembly);
     }
@@ -102,20 +154,20 @@ public class DiscoveryRadiusPlugin : BaseUnityPlugin
 
     private void FixConfigBoundaries(object _, EventArgs __)
     {
-        if (LandExploreRadius.Value < 0.0f) LandExploreRadius.Value = 0.0f;
-        if (LandExploreRadius.Value > 1000.0f) LandExploreRadius.Value = 1000.0f;
-        if (SeaExploreRadius.Value < 0.0f) SeaExploreRadius.Value = 0.0f;
-        if (SeaExploreRadius.Value > 1000.0f) SeaExploreRadius.Value = 1000.0f;
-        if (AltitudeRadiusMultiplier.Value < 0.0f) AltitudeRadiusMultiplier.Value = 0.0f;
-        if (AltitudeRadiusMultiplier.Value > 2.0f) AltitudeRadiusMultiplier.Value = 2.0f;
-        if (ForestRadiusMultiplier.Value < 0.0f) ForestRadiusMultiplier.Value = 0.0f;
-        if (ForestRadiusMultiplier.Value > 1.0f) ForestRadiusMultiplier.Value = 1.0f;
-        if (DaylightRadiusMultiplier.Value < 0.0f) DaylightRadiusMultiplier.Value = 0.0f;
-        if (DaylightRadiusMultiplier.Value > 1.0f) DaylightRadiusMultiplier.Value = 1.0f;
-        if (WeatherRadiusMultiplier.Value < 0.0f) WeatherRadiusMultiplier.Value = 0.0f;
-        if (WeatherRadiusMultiplier.Value > 1.0f) WeatherRadiusMultiplier.Value = 1.0f;
+        MinimumRadius.Value = Mathf.Clamp(MinimumRadius.Value, MinimumRadiusMin, MinimumRadiusMax);
+        MaximumRadius.Value = Mathf.Clamp(MaximumRadius.Value, MaximumRadiusMin, MaximumRadiusMax);
+        LandExploreRadius.Value = Mathf.Clamp(LandExploreRadius.Value, LandExploreRadiusMin, LandExploreRadiusMax);
+        SeaExploreRadius.Value = Mathf.Clamp(SeaExploreRadius.Value, SeaExploreRadiusMin, SeaExploreRadiusMax);
+        AltitudeRadiusMultiplier.Value = Mathf.Clamp(AltitudeRadiusMultiplier.Value, AltitudeRadiusMultiplierMin,
+            AltitudeRadiusMultiplierMax);
+        ForestRadiusMultiplier.Value = Mathf.Clamp(ForestRadiusMultiplier.Value, ForestRadiusMultiplierMin,
+            ForestRadiusMultiplierMax);
+        DaylightRadiusMultiplier.Value = Mathf.Clamp(DaylightRadiusMultiplier.Value, DaylightRadiusMultiplierMin,
+            DaylightRadiusMultiplierMax);
+        WeatherRadiusMultiplier.Value = Mathf.Clamp(WeatherRadiusMultiplier.Value, WeatherRadiusMultiplierMin,
+            WeatherRadiusMultiplierMax);
     }
-    
+
     private void DisplayRadiusValueSettingChanged(object _, EventArgs __)
     {
         if (HUDPatches.RadiusHudText != null)
@@ -139,7 +191,7 @@ public class DiscoveryRadiusPlugin : BaseUnityPlugin
             }
         }
     }
-    
+
     private void DisplayDebugSettingChanged(object _, EventArgs __)
     {
         if (HUDPatches.DebugText != null)
