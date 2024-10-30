@@ -15,7 +15,7 @@ namespace DiscoveryRadius;
 public class DiscoveryRadiusPlugin : BaseUnityPlugin
 {
     public const string ModName = "DiscoveryRadius";
-    public const string ModVersion = "1.1.0";
+    public const string ModVersion = "1.1.1";
     private const string ModAuthor = "FixItFelix";
     private const string ModGuid = ModAuthor + "." + ModName;
 

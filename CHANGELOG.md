@@ -1,3 +1,4 @@
+* 1.1.1 -> updated for Valheim version 0.219.14
 * 1.1.0 -> 
   * added config options for min / max discovery radius (was used in code, but not configurable)
   * bit of code rework

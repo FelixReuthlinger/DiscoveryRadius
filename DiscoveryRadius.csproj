@@ -55,7 +55,7 @@
                 <GamePath Condition="!Exists('$(GamePath)')">C:\Program Files (x86)\Steam\steamapps\common\Valheim</GamePath>
                 <GamePath Condition="!Exists('$(GamePath)')">D:\SteamLibrary\steamapps\common\Valheim</GamePath>
                 <BepInExPath Condition="!Exists('$(BepInExPath)')AND Exists('$(GamePath)')">$(GamePath)\BepInEx</BepInExPath>
-                <CorlibPath Condition="!Exists('$(CorlibPath)') AND Exists('$(GamePath)')">$(GamePath)\unstripped_corlib</CorlibPath>
+                <ManagedPath Condition="!Exists('$(CorlibPath)') AND Exists('$(GamePath)')">$(GamePath)\valheim_Data\Managed</ManagedPath>
                 <PublicizedAssembliesPath Condition="!Exists('$(PublicizedAssembliesPath)') AND Exists('$(GamePath)')">$(GamePath)\valheim_Data\Managed\publicized_assemblies</PublicizedAssembliesPath>
             </PropertyGroup>
         </When>
@@ -90,19 +90,19 @@
         <Reference Include="System.Data" />
         <Reference Include="System.Xml" />
         <Reference Include="UnityEngine">
-            <HintPath>$(CorlibPath)\UnityEngine.dll</HintPath>
+            <HintPath>$(ManagedPath)\UnityEngine.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-            <HintPath>$(CorlibPath)\UnityEngine.CoreModule.dll</HintPath>
+            <HintPath>$(ManagedPath)\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.UI">
-            <HintPath>$(CorlibPath)\UnityEngine.UI.dll</HintPath>
+            <HintPath>$(ManagedPath)\UnityEngine.UI.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.UIModule">
-            <HintPath>$(CorlibPath)\UnityEngine.UIModule.dll</HintPath>
+            <HintPath>$(ManagedPath)\UnityEngine.UIModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.TextRenderingModule">
-            <HintPath>$(CorlibPath)\UnityEngine.TextRenderingModule.dll</HintPath>
+            <HintPath>$(ManagedPath)\UnityEngine.TextRenderingModule.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>
@@ -180,11 +180,11 @@
         <RemoveDir Directories="$(ProjectDir)\TempPackage" />
         <Message Text="Created ThunderStore mod zip file '$(HOMEDRIVE)$(HOMEPATH)\Downloads\$(AssemblyName).zip'" />
     </Target>
-    <Import Project="packages\ILRepack.Lib.MSBuild.Task.2.0.32\build\ILRepack.Lib.MSBuild.Task.targets" Condition="Exists('packages\ILRepack.Lib.MSBuild.Task.2.0.32\build\ILRepack.Lib.MSBuild.Task.targets')" />
+    <Import Project="packages\ILRepack.Lib.MSBuild.Task.2.0.34.2\build\ILRepack.Lib.MSBuild.Task.targets" Condition="Exists('packages\ILRepack.Lib.MSBuild.Task.2.0.34.2\build\ILRepack.Lib.MSBuild.Task.targets')" />
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>
         <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
       </PropertyGroup>
-      <Error Condition="!Exists('packages\ILRepack.Lib.MSBuild.Task.2.0.32\build\ILRepack.Lib.MSBuild.Task.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ILRepack.Lib.MSBuild.Task.2.0.32\build\ILRepack.Lib.MSBuild.Task.targets'))" />
+      <Error Condition="!Exists('packages\ILRepack.Lib.MSBuild.Task.2.0.34.2\build\ILRepack.Lib.MSBuild.Task.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ILRepack.Lib.MSBuild.Task.2.0.34.2\build\ILRepack.Lib.MSBuild.Task.targets'))" />
     </Target>
 </Project>
